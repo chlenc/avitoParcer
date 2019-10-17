@@ -11,7 +11,7 @@ firebase.initializeApp({
     databaseURL: 'https://rent-manager-bot.firebaseio.com/'
 });
 
-const targetAddress = 'Берсеневская Набережная 4 ст3';
+const targetAddress = 'Берсеневская набережная, 4, с3, Москва, Россия';
 const maxPrice = 40000;
 
 const URL = `https://www.avito.ru/moskva/kvartiry/sdam/na_dlitelnyy_srok?cd=1&pmax=${maxPrice}&pmin=0&user=1&s=104`;
