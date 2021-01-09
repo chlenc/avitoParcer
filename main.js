@@ -1,8 +1,8 @@
-require('dotenv').config()
+// require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api');
-// const bot = new TelegramBot("1437222649:AAFQ89PJuXYHjK8IVQ4n2otWEZMS_DxYC7M", {polling: true});
-const bot = new TelegramBot(process.env.TOKEN, {webHook: {port: +process.env.PORT}})
-bot.setWebHook(`${process.env.URL}/bot${process.env.TOKEN}`).catch(e => console.error(e));
+const bot = new TelegramBot("1437222649:AAFQ89PJuXYHjK8IVQ4n2otWEZMS_DxYC7M", {polling: true});
+// const bot = new TelegramBot(process.env.TOKEN, {webHook: {port: +process.env.PORT}})
+// bot.setWebHook(`${process.env.URL}/bot${process.env.TOKEN}`).catch(e => console.error(e));
 const groupId = '-490363061';
 const parcer = require('node-html-parser');
 const axois = require('axios');
