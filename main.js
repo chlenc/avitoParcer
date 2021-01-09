@@ -23,47 +23,52 @@ bot.onText(/\/echo/, msg => {
 });
 
 async function syncOffers() {
-    await firebase.database().ref("offersIdArray").once("value", async function (snapshot) {
-        const offersIdArray = snapshot.val() || [];
-        const res = await axois.get(URL)
-        const root = parcer.parse(res.data);
-        const data = root.querySelectorAll('.js-catalog-item-enum');
-        const parsedParams = data.map(home => {
-            try {
-                const id = home.id
-                const href = home.firstChild.childNodes[0].lastChild.rawAttrs.match(/href="(.+?)"/)[1]
-                const link = 'https://www.avito.ru' + href
-                const title = home.firstChild.childNodes[1].childNodes[0].firstChild.firstChild.text
-                const price = home.firstChild.childNodes[1].childNodes[1].firstChild.firstChild.lastChild.text
-                return {id, link, title, price}
-            } catch (e) {
-                console.error(e)
-                return null
+    try {
+        await firebase.database().ref("offersIdArray").once("value", async function (snapshot) {
+            const offersIdArray = snapshot.val() || [];
+            const res = await axois.get(URL)
+            const root = parcer.parse(res.data);
+            const data = root.querySelectorAll('.js-catalog-item-enum');
+            const parsedParams = data.map(home => {
+                try {
+                    const id = home.id
+                    const href = home.firstChild.childNodes[0].lastChild.rawAttrs.match(/href="(.+?)"/)[1]
+                    const link = 'https://www.avito.ru' + href
+                    const title = home.firstChild.childNodes[1].childNodes[0].firstChild.firstChild.text
+                    const price = home.firstChild.childNodes[1].childNodes[1].firstChild.firstChild.lastChild.text
+                    return {id, link, title, price}
+                } catch (e) {
+                    console.error(e)
+                    return null
+                }
+            }).filter(v =>
+                v !== null
+                && (v.title.split(' ').includes('chanel') || v.title.split(' ').includes('Chanel'))
+                && !offersIdArray.includes(v.id)
+            )
+            const result = []
+            for (let i in parsedParams) {
+                try {
+                    const {id, link, title, price} = parsedParams[i]
+                    await bot.sendMessage(groupId, `${title}: ${price}`, {
+                        reply_markup: {
+                            inline_keyboard: [[{text: 'Ссылка на авито', url: link}]]
+                        }
+                    });
+                    await new Promise(r => (setTimeout(r, 1000)))
+                    result.push(id)
+                } catch (e) {
+                    console.error(e)
+                }
             }
-        }).filter(v =>
-            v !== null
-            && (v.title.split(' ').includes('chanel') || v.title.split(' ').includes('Chanel'))
-            && !offersIdArray.includes(v.id)
-        )
-        const result = []
-        for (let i in parsedParams) {
-            try {
-                const {id, link, title, price} = parsedParams[i]
-                await bot.sendMessage(groupId, `${title}: ${price}`, {
-                    reply_markup: {
-                        inline_keyboard: [[{text: 'Ссылка на авито', url: link}]]
-                    }
-                });
-                await new Promise(r => (setTimeout(r, 1000)))
-                result.push(id)
-            } catch (e) {
-                console.error(e)
-            }
-        }
-        await firebase.database().ref('/')
-            .update({offersIdArray: offersIdArray.concat(result)})
-        console.log(result)
-    })
+            await firebase.database().ref('/')
+                .update({offersIdArray: offersIdArray.concat(result)})
+            console.log(result)
+        })
+    } catch (e) {
+        console.log('error:', e)
+    }
+
 }
 
 
