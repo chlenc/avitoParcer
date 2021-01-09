@@ -26,7 +26,7 @@ async function syncOffers() {
     try {
         await firebase.database().ref("offersIdArray").once("value", async function (snapshot) {
             const offersIdArray = snapshot.val() || [];
-            const res = await axois.get(URL)
+            const res = await axois.get(URL).catch(e => console.log('axios error:',e))
             const root = parcer.parse(res.data);
             const data = root.querySelectorAll('.js-catalog-item-enum');
             const parsedParams = data.map(home => {
